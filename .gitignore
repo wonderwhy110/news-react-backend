@@ -1,0 +1,10 @@
+backend/node_modules/
+backend/dist/
+backend/uploads/
+backend/.env
+
+postgres-data/
+
+*.log
+.DS_Store
+docker-compose-data/
