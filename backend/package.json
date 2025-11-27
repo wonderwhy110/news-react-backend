@@ -11,6 +11,7 @@
     "start": "node dist/main",
     "start:dev": "ts-node-dev --respawn --transpile-only src/main.ts",
     "start:prod": "node dist/main",
+    "start:local": "cp .env.development .env && ts-node-dev --respawn --transpile-only src/main.ts",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"
   },
   "dependencies": {

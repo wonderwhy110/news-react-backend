@@ -1,18 +1,18 @@
 // src/post/post.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
-import { Post } from './entities/post.entity';
-import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
-import { UserService } from '../user/user.service'; // Импортируем UserService
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository, In, Like } from "typeorm";
+import { Post } from "./entities/post.entity";
+import { CreatePostDto } from "./dto/create-post.dto";
+import { UpdatePostDto } from "./dto/update-post.dto";
+import { UserService } from "../user/user.service"; // Импортируем UserService
 
 @Injectable()
 export class PostService {
   constructor(
     @InjectRepository(Post)
     private postsRepository: Repository<Post>,
-    private readonly userService: UserService, // Используем UserService вместо прямого доступа к репозиторию
+    private readonly userService: UserService // Используем UserService вместо прямого доступа к репозиторию
   ) {}
 
   async create(userId: number, createPostDto: CreatePostDto): Promise<Post> {
@@ -29,8 +29,8 @@ export class PostService {
 
   async findAll(): Promise<Post[]> {
     return await this.postsRepository.find({
-      relations: ['user', 'comments', 'comments.user'],
-      order: { createdAt: 'DESC' },
+      relations: ["user", "comments", "comments.user"],
+      order: { createdAt: "DESC" },
     });
   }
 
@@ -39,19 +39,19 @@ export class PostService {
 
     return await this.postsRepository.find({
       where: { userId },
-      relations: ['user', 'comments', 'comments.user'],
-      order: { createdAt: 'DESC' },
+      relations: ["user", "comments", "comments.user"],
+      order: { createdAt: "DESC" },
     });
   }
 
   async findOne(post_id: string): Promise<Post> {
     const post = await this.postsRepository.findOne({
       where: { post_id },
-      relations: ['user', 'comments', 'comments.user'],
+      relations: ["user", "comments", "comments.user"],
     });
 
     if (!post) {
-      throw new NotFoundException('Post not found');
+      throw new NotFoundException("Post not found");
     }
 
     return post;
@@ -60,19 +60,19 @@ export class PostService {
   async update(
     post_id: string,
     userId: number,
-    updatePostDto: UpdatePostDto,
+    updatePostDto: UpdatePostDto
   ): Promise<Post> {
     const post = await this.postsRepository.findOne({
       where: { post_id },
-      relations: ['user'],
+      relations: ["user"],
     });
 
     if (!post) {
-      throw new NotFoundException('Post not found');
+      throw new NotFoundException("Post not found");
     }
 
     if (post.userId !== userId) {
-      throw new NotFoundException('You can only update your own posts');
+      throw new NotFoundException("You can only update your own posts");
     }
 
     if (updatePostDto.content !== undefined) {
@@ -85,15 +85,15 @@ export class PostService {
   async remove(post_id: string, userId: number): Promise<void> {
     const post = await this.postsRepository.findOne({
       where: { post_id },
-      relations: ['user'],
+      relations: ["user"],
     });
 
     if (!post) {
-      throw new NotFoundException('Post not found');
+      throw new NotFoundException("Post not found");
     }
 
     if (post.userId !== userId) {
-      throw new NotFoundException('You can only delete your own posts');
+      throw new NotFoundException("You can only delete your own posts");
     }
 
     await this.postsRepository.remove(post);
@@ -104,7 +104,7 @@ export class PostService {
       where: { post_id: postId },
     });
 
-    if (!post) throw new NotFoundException('Post not found');
+    if (!post) throw new NotFoundException("Post not found");
 
     // ИСПРАВЛЕНИЕ: проверяем и инициализируем массив
     if (!post.likedByUserIds || post.likedByUserIds === null) {
@@ -113,7 +113,7 @@ export class PostService {
 
     // Проверяем, не лайкнул ли уже
     if (post.likedByUserIds.includes(userId)) {
-      throw new Error('Post already liked');
+      throw new Error("Post already liked");
     }
 
     post.likedByUserIds = [...post.likedByUserIds, userId];
@@ -126,7 +126,7 @@ export class PostService {
     const post = await this.findOne(postId);
 
     if (!post) {
-      throw new NotFoundException('Post not found');
+      throw new NotFoundException("Post not found");
     }
 
     // Убираем ID пользователя из массива
@@ -134,32 +134,18 @@ export class PostService {
     post.likes = Math.max(0, post.likes - 1);
     return await this.postsRepository.save(post);
   }
-    async searchPosts(query: string, page: number = 1, limit: number = 20): Promise<{
-    posts: Post[];
-    total: number;
-    page: number;
-    totalPages: number;
-  }> {
-    const skip = (page - 1) * limit;
-    
-    const [posts, total] = await this.postsRepository
-      .createQueryBuilder('post')
-      .leftJoinAndSelect('post.user', 'user') // Загружаем пользователя
-      .where('post.content ILIKE :query', { query: `%${query}%` })
-      .orWhere('user.name ILIKE :query', { query: `%${query}%` })
-      .orderBy('post.createdAt', 'DESC')
-      .skip(skip)
-      .take(limit)
-      .getManyAndCount();
+  async searchPosts(query: string) {
+    const searchQuery = `%${query}%`;
 
-    return {
-      posts,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit)
-    };
+    const results = await this.postsRepository.find({
+      relations: ["user"],
+      where: [
+        { content: Like(searchQuery) },
+        { user: { name: Like(searchQuery) } },
+      ],
+      order: { createdAt: "DESC" },
+    });
+
+    return results;
   }
-
-
-  
 }
