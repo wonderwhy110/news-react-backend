@@ -11,16 +11,17 @@ async function bootstrap() {
   // Настройка CORS - ДОБАВЬТЕ ваш GitHub Pages домен
   app.enableCors({
     origin: [
-      'https://wonderwhy110.github.io', // ← ДОБАВЬТЕ ЭТУ СТРОКУ
+      'https://wonderwhy110.github.io',
       'https://tnews-frontend.onrender.com',
       'http://localhost:3001',
       'http://176.123.167.59:8080', 
       'http://localhost:3000',
       'http://localhost:5173',
       'https://f781de604efe9476b4e836af499cf813.serveo.net',
-      'http://176.123.167.59', // ← ДОБАВЬТЕ этот (без порта)
-  'http://176.123.167.59:80', // ← и этот
-      'http://127.0.0.1:3000', // ← ДОБАВЬТЕ и этот для локального тестирования
+      'http://176.123.167.59', 
+  'http://176.123.167.59:80', 
+      'http://127.0.0.1:3000', 
+      'https://69284ac0270717670b8f1794--rad-lollipop-85250c.netlify.app'
     ],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     credentials: true,
