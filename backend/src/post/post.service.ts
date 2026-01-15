@@ -43,19 +43,19 @@ export class PostService {
       order: { createdAt: "DESC" },
     });
   }
+async findOne(post_id: string): Promise<Post> {
+  // Ищем по id (primary key), а не по post_id
+  const post = await this.postsRepository.findOne({
+    where: { post_id: post_id }, // ИЗМЕНИТЬ НА { id: post_id }
+    relations: ["user", "comments", "comments.user"],
+  });
 
-  async findOne(post_id: string): Promise<Post> {
-    const post = await this.postsRepository.findOne({
-      where: { post_id },
-      relations: ["user", "comments", "comments.user"],
-    });
-
-    if (!post) {
-      throw new NotFoundException("Post not found");
-    }
-
-    return post;
+  if (!post) {
+    throw new NotFoundException("Post not found");
   }
+
+  return post;
+}
 
   async update(
     post_id: string,

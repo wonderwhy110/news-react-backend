@@ -13,6 +13,7 @@ async function bootstrap() {
     origin: [
       'https://wonderwhy110.github.io',
       'https://tnews-frontend.onrender.com',
+      'https://wonderwhy110.github.io/news-reactApp',
       'http://localhost:3001',
       'http://176.123.167.59:8080', 
       'http://localhost:3000',
@@ -24,7 +25,7 @@ async function bootstrap() {
       'https://69284ac0270717670b8f1794--rad-lollipop-85250c.netlify.app'
     ],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    credentials: true,
+    credentials: false,
   });
 
   // Настройка статических файлов

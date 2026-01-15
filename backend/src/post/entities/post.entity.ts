@@ -1,6 +1,6 @@
 // post.entity.ts
-import { Comment } from '../../comments/entities/comment.entity';
-import { User } from '../../user/entities/user.entity';
+import { Comment } from "../../comments/entities/comment.entity";
+import { User } from "../../user/entities/user.entity";
 import {
   Column,
   CreateDateColumn,
@@ -11,13 +11,14 @@ import {
   JoinColumn,
   OneToMany,
   PrimaryColumn,
-} from 'typeorm';
+} from "typeorm";
 @Entity()
 export class Post {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   post_id: string; // Теперь UUID будет генерироваться автоматически
+  
 
-  @Column('text')
+  @Column("text")
   content: string;
 
   @Column({ default: 0 })
@@ -30,18 +31,18 @@ export class Post {
   updatedAt: Date;
 
   @ManyToOne(() => User, (user) => user.posts)
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: "user_id" })
   user: User;
 
-  @Column({ name: 'user_id' }) // Добавь name
+  @Column({ name: "user_id" }) // Добавь name
   userId: number;
 
   @OneToMany(() => Comment, (comment) => comment.post, {
     cascade: true,
-    onDelete: 'CASCADE',
+    onDelete: "CASCADE",
   })
   comments: Comment[];
 
-  @Column('jsonb', { default: [] })
+  @Column("jsonb", { default: [] })
   likedByUserIds: number[];
 }
