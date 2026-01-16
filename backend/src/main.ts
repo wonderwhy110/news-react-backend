@@ -25,7 +25,7 @@ async function bootstrap() {
       'https://69284ac0270717670b8f1794--rad-lollipop-85250c.netlify.app'
     ],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    credentials: false,
+    credentials: true,
   });
 
   // Настройка статических файлов
