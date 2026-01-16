@@ -31,7 +31,7 @@ services:
       NODE_ENV: ${NODE_ENV}
       PORT: ${PORT}
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000" 
     depends_on:
       postgres:
         condition: service_healthy
