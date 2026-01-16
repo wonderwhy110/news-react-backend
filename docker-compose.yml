@@ -5,20 +5,20 @@ services:
     image: postgres:15
     container_name: postgres_db
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME:-newsapp}
+      POSTGRES_USER: ${DB_USER:-news_app_user}      # ← DB_USER как в вашем .env
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-babyniga2020_}
     ports:
       - "5432:5432"
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
     restart: unless-stopped
     healthcheck:
-        test: ["CMD-SHELL", "pg_isready -U postgres"]
-        interval: 30s
-        timeout: 10s
-        retries: 3
-    
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-news_app_user}"]  # ← исправлено
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
 
   backend:
     build: 
@@ -26,13 +26,27 @@ services:
       dockerfile: Dockerfile
     container_name: nestjs_backend
     environment:
+      # Database - используем DB_USER как в вашем .env
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-news_app_user}           # ← DB_USER
+      DB_PASSWORD: ${DB_PASSWORD:-babyniga2020_}
+      DB_NAME: ${DB_NAME:-newsapp}
       DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
-      JWT_SECRET: ${JWT_SECRET}
-      NODE_ENV: ${NODE_ENV}
-      PORT: ${PORT}
+      
+      # App
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${PORT:-3000}
+      JWT_SECRET: ${JWT_SECRET:-bhyjkjvhbhkncdjchvydxbgsgbhkgy}
+      
+      # CORS domain
+      FRONTEND_DOMAIN: ${FRONTEND_DOMAIN:-http://176.123.167.59}
+      
     ports:
-      - "127.0.0.1:3000:3000" 
+      - "3000:3000"  # Доступен снаружи
     depends_on:
       postgres:
         condition: service_healthy
     restart: unless-stopped
+    volumes:
+      - ./backend/uploads:/app/uploads

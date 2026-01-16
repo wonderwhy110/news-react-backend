@@ -20,7 +20,7 @@ import { CommentsModule } from './comments/comments.module';
         url: configService.get('DATABASE_URL'), // Будет работать если есть DATABASE_URL
         host: configService.get('DB_HOST') || 'localhost',
         port: configService.get('DB_PORT') || 5432,
-        username: configService.get('DB_USERNAME') || 'postgres',
+        username: configService.get('DB_USER') || 'postgres',
         password: configService.get('DB_PASSWORD') || 'admin',
         database: configService.get('DB_NAME') || 'news',
         
