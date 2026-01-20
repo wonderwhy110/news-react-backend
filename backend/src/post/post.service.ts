@@ -134,18 +134,19 @@ async findOne(post_id: string): Promise<Post> {
     post.likes = Math.max(0, post.likes - 1);
     return await this.postsRepository.save(post);
   }
-  async searchPosts(query: string) {
-    const searchQuery = `%${query}%`;
+ async searchPosts(query: string) {
 
-    const results = await this.postsRepository.find({
-      relations: ["user"],
-      where: [
-        { content: Like(searchQuery) },
-        { user: { name: Like(searchQuery) } },
-      ],
-      order: { createdAt: "DESC" },
-    });
 
-    return results;
-  }
+  const results = await this.postsRepository
+    .createQueryBuilder('post')
+    .leftJoinAndSelect('post.user', 'user')
+    .where(
+      'LOWER(post.content) LIKE LOWER(:query) OR LOWER(user.name) LIKE LOWER(:query)',
+      { query: `%${query}%` } 
+    )
+    .orderBy('post.createdAt', 'DESC')
+    .getMany();
+
+  return results;
+}
 }
